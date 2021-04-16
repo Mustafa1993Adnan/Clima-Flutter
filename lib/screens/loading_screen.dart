@@ -19,8 +19,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void getLocationData() async {
-    WeatherModel weatherModel = WeatherModel();
-    dynamic weatherData = weatherModel.getLocationWeather();
+    var weatherData = await WeatherModel().getLocationWeather();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return LocationScreen(
         locationWeather: weatherData,
@@ -33,7 +32,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return Scaffold(
         body: Center(
       child: SpinKitThreeBounce(
-        color: Colors.blueAccent,
+        color: Colors.green,
         size: 60,
       ),
     ));

@@ -1,7 +1,7 @@
+import 'package:clima/screens/city_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
 
-import '../services/weather.dart';
 import '../services/weather.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -24,10 +24,18 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void updateUserInterface(dynamic weatherData) {
     setState(() {
-      cityName = weatherData['timezone'];
-      double temp = weatherData['hourly'][3]['temp'];
+      if (weatherData == null) {
+        temperature = 0;
+        cityName = '';
+        weatherIcon = '';
+        weatherMessage = '';
+        return;
+      }
+
+      cityName = weatherData['name'];
+      var temp = weatherData['main']['temp'];
       temperature = temp.toInt();
-      var condition = weatherData['hourly'][25]['weather'][0]['id'];
+      var condition = weatherData['weather'][0]['id'];
       weatherIcon = weatherModel.getWeatherIcon(condition);
       weatherMessage = weatherModel.getMessage(temperature);
     });
@@ -54,21 +62,32 @@ class _LocationScreenState extends State<LocationScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      updateUserInterface(widget.locationWeather);
-                      print(widget.locationWeather);
+                  TextButton(
+                    onPressed: () async {
+                      var weatherData = await weatherModel.getLocationWeather();
+                      updateUserInterface(weatherData);
                     },
                     child: Icon(
                       Icons.near_me,
+                      color: Colors.white,
                       size: 50.0,
                     ),
                   ),
-                  FlatButton(
-                    onPressed: () {},
+                  TextButton(
+                    onPressed: () async {
+                      var typedCityName = await Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return CityScreen();
+                      }));
+                      if (typedCityName != null) {
+                        updateUserInterface(
+                            await weatherModel.getCityWeather(typedCityName));
+                      }
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
+                      color: Colors.white,
                     ),
                   ),
                 ],
